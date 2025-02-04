@@ -1,18 +1,18 @@
 use strict;
 use warnings;
 use Test::More;
-use Random::RDTSC;
+use Random::RDTSC qw(get_rdtsc rdtsc_rand64);
 use Config;
 
 my $is_64bit = ($Config{use64bitint} || $Config{use64bitall});
 
 # Have to be larger than zero
-cmp_ok(Random::RDTSC::get_rdtsc()   , '>', 0);
-cmp_ok(Random::RDTSC::rdtsc_rand64(), '>', 0);
+cmp_ok(get_rdtsc()   , '>', 0);
+cmp_ok(rdtsc_rand64(), '>', 0);
 
 # Make sure we're getting real integers
-ok(is_int(Random::RDTSC::get_rdtsc()));
-ok(is_int(Random::RDTSC::rdtsc_rand64()));
+ok(is_int(get_rdtsc()));
+ok(is_int(rdtsc_rand64()));
 
 done_testing();
 
