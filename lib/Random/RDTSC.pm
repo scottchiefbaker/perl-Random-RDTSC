@@ -5,10 +5,9 @@ use warnings;
 require Exporter;
 require DynaLoader;
 
-our @ISA = qw(Exporter DynaLoader);
+our @ISA       = qw(Exporter DynaLoader);
 our @EXPORT_OK = qw(get_rdtsc rdtsc_rand64);
-
-our $VERSION = '0.1';
+our $VERSION   = '0.1';
 
 bootstrap Random::RDTSC $VERSION;
 
