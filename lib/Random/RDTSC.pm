@@ -45,15 +45,6 @@ PRNG to get repeatable random numbers.
 
 Based on L<rdtsc_rand|https://github.com/scottchiefbaker/rdtsc_rand>.
 
-=head1 CAVEATS
-
-=head2 Are there better sources of randomness?
-
-Most definitely. Your operating system gathers a source of entropy for
-randomness that is very high quality. For cryptographic applications and
-anything where true randomness is required you should use those instead.
-C<Random::RDTSC> is designed to be quick and simple.
-
 =head1 FUNCTIONS
 
 =head2 get_rdtsc
@@ -67,6 +58,15 @@ Returns the current timestamp counter value.
     my $rand = rdtsc_rand64();
 
 Returns a 64-bit random number based on the timestamp counter.
+
+=head1 CAVEATS
+
+=head2 Are there better sources of randomness?
+
+Most definitely. Your operating system gathers a source of entropy for
+randomness that is very high quality. For cryptographic applications and
+anything where true randomness is required you should use those instead.
+C<Random::RDTSC> is designed to be quick and simple.
 
 =head1 AUTHOR
 
