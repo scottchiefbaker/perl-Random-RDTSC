@@ -38,6 +38,7 @@ sub get_avg_rand64 {
 	}
 
 	my $ret = $total / $count;
+	$ret    = int($ret);
 
 	return $ret;
 }
