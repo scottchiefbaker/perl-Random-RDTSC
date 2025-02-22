@@ -18,16 +18,6 @@ static uint64_t hash_msh(uint64_t x) {
 	return x;
 }
 
-// MurmurHash3 Finalizer (Passes SmallCrush and PractRand up to 32GB)
-static uint64_t hash_mur3(uint64_t x) {
-	x ^= x >> 33;
-	x *= 0xff51afd7ed558ccd;
-	x ^= x >> 33;
-	x *= 0xc4ceb9fe1a85ec53;
-	x ^= x >> 33;
-	return x;
-}
-
 #if (defined(__ARM_ARCH))
 // Nanoseconds since Unix epoch
 static uint64_t rdtsc_nanos() {
@@ -58,6 +48,58 @@ static uint64_t rdtsc_nanos() {
 #pragma intrinsic(__rdtsc)
 #endif
 
+// CPUID stuff is only for X86 + GCC/Clang, MSVC has it in intrin.h
+#if defined(__x86_64) && (defined(__GNUC__) || defined(__clang__))
+#include <cpuid.h>
+#endif
+
+#if defined(__ARM_ARCH) && __ARM_ARCH >= 8
+#define HAS_RANDR 1
+#endif
+
+#ifdef __x86_64
+#define HAS_RDRAND 1
+#endif
+
+// Returns 1 if hardware has RNG, 0 otherwise
+int has_hwrng() {
+	// Cache/memoize the results for speed (only check once)
+	static int8_t ret = -1;
+
+	if (ret != -1) {
+		return ret;
+	}
+
+#ifdef HAS_RDRAND
+    unsigned int eax = 0, ebx = 0, ecx = 0, edx = 0;
+    __get_cpuid(1, &eax, &ebx, &ecx, &edx);
+    ret = (ecx & bit_RDRND) != 0;
+#elif HAS_RANDR
+	uint64_t features;
+	asm volatile("mrs %0, ID_AA64ISAR0_EL1" : "=r"(features));
+	ret = (int)(((features >> 60) & 0xF) != 0);  // Check RNDR bit field
+#else
+	ret = 0;
+#endif
+
+	return ret;
+}
+
+// Returns 1 on success, 0 on failure
+int get_hw_rand64(uint64_t* value) {
+#ifdef HAS_RDRAND
+    unsigned char ok;
+    asm volatile("rdrand %0; setc %1" : "=r" (*value), "=qm" (ok) : : "cc");
+    return ok ? 1 : 0;
+#elif HAS_RANDR
+	asm volatile("mrs %0, s3_3_c2_c4_0" : "=r"(*value));
+    return 1;
+#else
+	*value = 0;
+	return 0;
+#endif
+}
+
 // Get the instruction counter for various CPU/Platforms
 static uint64_t get_rdtsc() {
 #if defined(_WIN32) || defined(_WIN64)
@@ -82,6 +124,19 @@ static uint64_t get_rdtsc() {
 
 // Get an unsigned 64bit random integer
 static uint64_t rdtsc_rand64() {
+
+#if USE_HWRNG
+	// Hardware rand supported by x86_64 and ARM 8.5+
+	if (has_hwrng()) {
+		uint64_t num = 0;
+		// Returns 0/1 if the hwrng is good, if it's not good
+		// we fallback to rdtsc below
+		if (get_hw_rand64(&num)) {
+			return num;
+		}
+	}
+#endif
+
 	// Hash the rdtsc value through hash64
 	uint64_t rdtsc_val = get_rdtsc();
 	uint64_t ret       = hash_msh(rdtsc_val);
