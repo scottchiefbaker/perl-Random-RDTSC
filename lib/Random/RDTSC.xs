@@ -25,15 +25,13 @@ SV *hwrng()
     OUTPUT:
         RETVAL
 
-UV
-get_rdtsc()
+UV get_rdtsc()
     CODE:
         RETVAL = get_rdtsc();
     OUTPUT:
         RETVAL
 
-UV
-rdtsc_rand64()
+UV rdtsc_rand64()
     CODE:
         RETVAL = rdtsc_rand64();
     OUTPUT:
