@@ -8,7 +8,7 @@ MODULE = Random::RDTSC PACKAGE = Random::RDTSC
 PROTOTYPES: DISABLE
 
 SV *hwrng()
-    CODE:
+	CODE:
 		SV *ret = newSV(0); // undef
 
 		// If we have HWRNG and the value is good
@@ -22,17 +22,17 @@ SV *hwrng()
 		}
 
 		RETVAL = ret;
-    OUTPUT:
-        RETVAL
+	OUTPUT:
+		RETVAL
 
 UV get_rdtsc()
-    CODE:
-        RETVAL = get_rdtsc();
-    OUTPUT:
-        RETVAL
+	CODE:
+		RETVAL = get_rdtsc();
+	OUTPUT:
+		RETVAL
 
 UV rdtsc_rand64()
-    CODE:
-        RETVAL = rdtsc_rand64();
-    OUTPUT:
-        RETVAL
+	CODE:
+		RETVAL = rdtsc_rand64();
+	OUTPUT:
+		RETVAL
