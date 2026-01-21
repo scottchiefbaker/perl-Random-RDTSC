@@ -61,7 +61,7 @@ Returns a 64-bit random number based on the timestamp counter.
 
 =head2 has_hwrng
 
-    my $rand = has_hwrng();
+    my $ok = has_hwrng();
 
 Returns a boolean indicating if your CPU supports generating random numbers
 via a hardware RNG
