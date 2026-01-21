@@ -16,6 +16,16 @@ for (1 .. 8) {
 	print "Rand64: " . Random::RDTSC::rdtsc_rand64() . "\n";
 }
 
+print "\n";
+
+if (Random::RDTSC::has_hwrng()) {
+	for (1 .. 8) {
+		print "HWRNG : " . Random::RDTSC::get_hwrng() . "\n";
+	}
+} else {
+	print "Your CPU does not support hardware RNG\n";
+}
+
 ###############################################################################
 ###############################################################################
 
